@@ -67,6 +67,12 @@
                     <button type="submit" class="btn btn-primary">Marquer terminé</button>
                 </form>
             @endif
+
+            @if($booking->user_id === auth()->id())
+                <a href="{{ route('messages.show', $booking->property->user_id) }}" class="btn btn-ghost">Contacter l'hôte</a>
+            @elseif($booking->property->user_id === auth()->id())
+                <a href="{{ route('messages.show', $booking->user_id) }}" class="btn btn-ghost">Contacter le locataire</a>
+            @endif
         </div>
     </div>
 

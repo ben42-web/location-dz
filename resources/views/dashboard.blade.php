@@ -66,6 +66,7 @@
             <div style="font-size:0.8125rem;color:#64748b;">{{ $booking->user->name }} · {{ $booking->check_in->format('d/m') }} → {{ $booking->check_out->format('d/m') }} · {{ number_format($booking->total_price, 0, ',', ' ') }} DA</div>
         </div>
         <span class="badge badge-{{ $booking->status }}">{{ ucfirst($booking->status) }}</span>
+        <a href="{{ route('messages.show', $booking->user_id) }}" class="btn btn-ghost" style="font-size:0.8125rem;">Message</a>
         <a href="{{ route('bookings.show', $booking) }}" class="btn btn-ghost" style="font-size:0.8125rem;">Détail</a>
     </div>
     @empty
