@@ -47,9 +47,9 @@
     <p style="color:#64748b;margin-bottom:1.5rem;">Vous n'avez pas encore d'annonces.</p>
     @endforelse
 
-    {{-- Incoming Bookings --}}
+    {{-- Réservations reçues (hôte) --}}
     <h2 style="font-size:1.125rem;font-weight:600;margin:1.5rem 0 0.75rem;">Réservations reçues</h2>
-    @forelse($myBookings as $booking)
+    @forelse($receivedBookings as $booking)
     <div class="glass" style="padding:1rem;margin-bottom:0.75rem;display:flex;gap:1rem;align-items:center;">
         <div style="flex:1;">
             <div style="font-weight:600;">{{ $booking->property->title }}</div>
