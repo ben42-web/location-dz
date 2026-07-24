@@ -24,7 +24,8 @@ class ReviewController extends Controller
         }
 
         if ($booking->status !== 'completed') {
-            return back()->withErrors(['rating' => 'Vous ne pouvez laisser un avis qu\'après un séjour.']);
+            return redirect()->route('bookings.show', $booking->id)
+                ->withErrors(['rating' => 'Vous ne pouvez laisser un avis qu\'après un séjour.']);
         }
 
         $existing = Review::where('user_id', auth()->id())
@@ -32,7 +33,8 @@ class ReviewController extends Controller
             ->first();
 
         if ($existing) {
-            return back()->withErrors(['rating' => 'Vous avez déjà laissé un avis pour ce séjour.']);
+            return redirect()->route('bookings.show', $booking->id)
+                ->withErrors(['rating' => 'Vous avez déjà laissé un avis pour ce séjour.']);
         }
 
         Review::create([
@@ -43,7 +45,8 @@ class ReviewController extends Controller
             'comment' => $validated['comment'] ?? null,
         ]);
 
-        return back()->with('success', 'Merci pour votre avis !');
+        return redirect()->route('bookings.show', $validated['booking_id'])
+            ->with('success', 'Merci pour votre avis !');
     }
 
     public function destroy(Review $review)
