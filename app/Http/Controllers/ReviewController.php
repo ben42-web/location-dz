@@ -19,8 +19,9 @@ class ReviewController extends Controller
 
         $booking = \App\Models\Booking::findOrFail($validated['booking_id']);
 
-        if ($booking->user_id !== auth()->id() || $booking->property_id !== $validated['property_id']) {
-            abort(403);
+        if ($booking->user_id !== auth()->id()) {
+            return redirect()->route('bookings.show', $booking->id)
+                ->withErrors(['rating' => 'Vous ne pouvez laisser un avis que pour vos propres réservations.']);
         }
 
         if ($booking->status !== 'completed') {
