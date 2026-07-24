@@ -60,6 +60,18 @@ class PropertyController extends Controller
             $q->where('status', '!=', 'cancelled');
         }]);
 
+        // Dates prises pour désactiver dans le calendrier
+        $bookedDates = [];
+        foreach ($property->bookings as $booking) {
+            $start = $booking->check_in->copy();
+            $end = $booking->check_out->copy();
+            while ($start->lte($end)) {
+                $bookedDates[] = $start->format('Y-m-d');
+                $start->addDay();
+            }
+        }
+        $bookedDates = array_unique($bookedDates);
+
         $related = Property::where('id', '!=', $property->id)
             ->where('city', $property->city)
             ->where('is_active', true)
@@ -72,7 +84,7 @@ class PropertyController extends Controller
             $isFavorited = $property->favorites()->where('user_id', auth()->id())->exists();
         }
 
-        return view('properties.show', compact('property', 'related', 'isFavorited'));
+        return view('properties.show', compact('property', 'related', 'isFavorited', 'bookedDates'));
     }
 
     public function create()

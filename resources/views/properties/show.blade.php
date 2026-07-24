@@ -109,23 +109,29 @@
                 </div>
 
                 @auth
-                <form method="POST" action="{{ route('bookings.store') }}">
+                <form method="POST" action="{{ route('bookings.store') }}" id="bookingForm">
                     @csrf
                     <input type="hidden" name="property_id" value="{{ $property->id }}">
                     <div style="margin-bottom:0.75rem;">
                         <label class="label">Arrivée</label>
-                        <input type="date" name="check_in" class="input" min="{{ date('Y-m-d') }}" required value="{{ old('check_in') }}">
+                        <input type="date" name="check_in" id="checkIn" class="input" min="{{ date('Y-m-d') }}" required value="{{ old('check_in') }}">
                         @error('check_in') <span style="color:#fca5a5;font-size:0.75rem;">{{ $message }}</span> @enderror
                     </div>
                     <div style="margin-bottom:0.75rem;">
                         <label class="label">Départ</label>
-                        <input type="date" name="check_out" class="input" required value="{{ old('check_out') }}">
+                        <input type="date" name="check_out" id="checkOut" class="input" required value="{{ old('check_out') }}">
                         @error('check_out') <span style="color:#fca5a5;font-size:0.75rem;">{{ $message }}</span> @enderror
                     </div>
                     <div style="margin-bottom:1rem;">
                         <label class="label">Voyageurs</label>
                         <input type="number" name="guests" class="input" min="1" max="{{ $property->max_guests }}" value="{{ old('guests', 1) }}">
                     </div>
+                    @if(count($bookedDates))
+                    <div style="margin-bottom:0.75rem;padding:0.5rem 0.75rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:6px;">
+                        <div style="font-size:0.75rem;color:#fca5a5;font-weight:600;margin-bottom:0.25rem;">Dates indisponibles :</div>
+                        <div style="font-size:0.6875rem;color:#94a3b8;" id="bookedRanges"></div>
+                    </div>
+                    @endif
                     <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.75rem;">Réserver</button>
                 </form>
                 @else
@@ -155,4 +161,122 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endif
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var bookedDates = @json($bookedDates);
+    var checkIn = document.getElementById('checkIn');
+    var checkOut = document.getElementById('checkOut');
+    var form = document.getElementById('bookingForm');
+    var rangesEl = document.getElementById('bookedRanges');
+
+    if (!checkIn || !checkOut) return;
+
+    // Afficher les périodes indisponibles
+    if (rangesEl && bookedDates.length > 0) {
+        var ranges = [];
+        var sorted = bookedDates.slice().sort();
+        var start = sorted[0], prev = sorted[0];
+        for (var i = 1; i < sorted.length; i++) {
+            var prevDate = new Date(prev);
+            var currDate = new Date(sorted[i]);
+            var diff = (currDate - prevDate) / (1000 * 60 * 60 * 24);
+            if (diff === 1) {
+                prev = sorted[i];
+            } else {
+                ranges.push(formatRange(start, prev));
+                start = sorted[i];
+                prev = sorted[i];
+            }
+        }
+        ranges.push(formatRange(start, prev));
+        rangesEl.textContent = ranges.join(' · ');
+    }
+
+    function formatRange(a, b) {
+        var da = new Date(a + 'T00:00:00');
+        var db = new Date(b + 'T00:00:00');
+        var opts = { day: '2-digit', month: '2-digit' };
+        if (a === b) return da.toLocaleDateString('fr-FR', opts);
+        return da.toLocaleDateString('fr-FR', opts) + ' → ' + db.toLocaleDateString('fr-FR', opts);
+    }
+
+    function isBooked(dateStr) {
+        return bookedDates.indexOf(dateStr) !== -1;
+    }
+
+    function isInRange(start, end) {
+        var s = new Date(start + 'T00:00:00');
+        var e = new Date(end + 'T00:00:00');
+        var d = new Date(s);
+        while (d <= e) {
+            var ds = d.toISOString().slice(0, 10);
+            if (isBooked(ds)) return true;
+            d.setDate(d.getDate() + 1);
+        }
+        return false;
+    }
+
+    // Bloquer check_in si date prise
+    checkIn.addEventListener('change', function() {
+        if (isBooked(this.value)) {
+            alert('Cette date n\'est pas disponible.');
+            this.value = '';
+            return;
+        }
+        if (checkOut.value && this.value >= checkOut.value) {
+            checkOut.value = '';
+        }
+        updateCheckOutMin();
+    });
+
+    // Bloquer check_out si date prise ou si avant check_in
+    checkOut.addEventListener('change', function() {
+        if (isBooked(this.value)) {
+            alert('Cette date n\'est pas disponible.');
+            this.value = '';
+            return;
+        }
+        if (checkIn.value && this.value <= checkIn.value) {
+            alert('La date de départ doit être après la date d\'arrivée.');
+            this.value = '';
+            return;
+        }
+        if (checkIn.value && isInRange(checkIn.value, this.value)) {
+            alert('La période sélectionnée chevauche des dates indisponibles.');
+            this.value = '';
+            return;
+        }
+    });
+
+    function updateCheckOutMin() {
+        if (checkIn.value) {
+            var next = new Date(checkIn.value + 'T00:00:00');
+            next.setDate(next.getDate() + 1);
+            checkOut.min = next.toISOString().slice(0, 10);
+        }
+    }
+
+    // Vérifier au submit
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (isBooked(checkIn.value)) {
+                e.preventDefault();
+                alert('La date d\'arrivée n\'est pas disponible.');
+                return;
+            }
+            if (isBooked(checkOut.value)) {
+                e.preventDefault();
+                alert('La date de départ n\'est pas disponible.');
+                return;
+            }
+            if (checkIn.value && checkOut.value && isInRange(checkIn.value, checkOut.value)) {
+                e.preventDefault();
+                alert('La période sélectionnée contient des dates indisponibles.');
+                return;
+            }
+        });
+    }
+});
+</script>
 @endsection
