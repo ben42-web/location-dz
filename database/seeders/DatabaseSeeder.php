@@ -8,9 +8,11 @@ use App\Models\Booking;
 use App\Models\Review;
 use App\Models\Message;
 use App\Models\Favorite;
+use App\Models\PropertyType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,11 +22,33 @@ class DatabaseSeeder extends Seeder
             AmenitySeeder::class,
         ]);
 
+        // Property types
+        $types = [
+            ['name' => 'Appartement', 'slug' => 'apartment'],
+            ['name' => 'Maison', 'slug' => 'house'],
+            ['name' => 'Chambre', 'slug' => 'room'],
+            ['name' => 'Studio', 'slug' => 'studio'],
+            ['name' => 'Villa', 'slug' => 'villa'],
+        ];
+        foreach ($types as $t) {
+            PropertyType::create($t + ['is_active' => true, 'created_at' => now(), 'updated_at' => now()]);
+        }
+
+        // Admin
+        $admin = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@location-dz.dz',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
         // Host user
         $host = User::create([
             'name' => 'Youcef',
             'email' => 'youcef@location-dz.dz',
             'password' => Hash::make('password'),
+            'role' => 'host',
             'email_verified_at' => now(),
         ]);
 
@@ -33,6 +57,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Amina',
             'email' => 'amina@location-dz.dz',
             'password' => Hash::make('password'),
+            'role' => 'guest',
             'email_verified_at' => now(),
         ]);
 
@@ -40,6 +65,7 @@ class DatabaseSeeder extends Seeder
         $props = [
             [
                 'user_id' => $host->id,
+                'property_type_id' => PropertyType::where('slug', 'apartment')->value('id'),
                 'title' => 'Appartement moderne centre-ville Alger',
                 'description' => 'Bel appartement meublé au coeur d\'Alger, proche de la plage et des commerces.',
                 'type' => 'apartment',
@@ -55,6 +81,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'user_id' => $host->id,
+                'property_type_id' => PropertyType::where('slug', 'villa')->value('id'),
                 'title' => 'Villa avec piscine Oran',
                 'description' => 'Grande villa avec piscine privée, idéale pour les familles.',
                 'type' => 'villa',
@@ -70,6 +97,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'user_id' => $host->id,
+                'property_type_id' => PropertyType::where('slug', 'studio')->value('id'),
                 'title' => 'Studio cosy Constantine',
                 'description' => 'Petit studio charmant avec vue sur le pont Sidi M\'Cid.',
                 'type' => 'studio',
@@ -85,6 +113,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'user_id' => $host->id,
+                'property_type_id' => PropertyType::where('slug', 'house')->value('id'),
                 'title' => 'Maison traditionnelle Tlemcen',
                 'description' => 'Maison à la architecture traditionnelle, près de la Grande Mosquée.',
                 'type' => 'house',
@@ -100,6 +129,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'user_id' => $host->id,
+                'property_type_id' => PropertyType::where('slug', 'apartment')->value('id'),
                 'title' => 'Appartement vue mer Annaba',
                 'description' => 'Appartement moderne avec vue directe sur la Méditerranée.',
                 'type' => 'apartment',

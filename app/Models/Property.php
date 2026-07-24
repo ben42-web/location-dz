@@ -14,6 +14,7 @@ class Property extends Model
 
     protected $fillable = [
         'user_id',
+        'property_type_id',
         'title',
         'description',
         'type',
@@ -42,6 +43,11 @@ class Property extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function propertyType(): BelongsTo
+    {
+        return $this->belongsTo(PropertyType::class);
     }
 
     public function images(): HasMany

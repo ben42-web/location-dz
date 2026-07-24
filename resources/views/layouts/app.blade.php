@@ -50,6 +50,9 @@
             <div style="display:flex;align-items:center;gap:1rem;">
                 <a href="{{ route('properties.index') }}" style="color:#94a3b8;font-size:0.875rem;font-weight:500;">Explorer</a>
                 @auth
+                    @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.dashboard') }}" style="color:#fca5a5;font-size:0.875rem;font-weight:600;">⚙ Admin</a>
+                    @endif
                     <a href="{{ route('dashboard') }}" style="color:#94a3b8;font-size:0.875rem;font-weight:500;">Tableau de bord</a>
                     <a href="{{ route('messages.index') }}" style="color:#94a3b8;font-size:0.875rem;font-weight:500;">Messages</a>
                     <div x-data="{ open: false }" style="position:relative;">

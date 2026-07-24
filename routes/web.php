@@ -7,6 +7,12 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminPropertyController;
+use App\Http\Controllers\Admin\AdminPropertyTypeController;
+use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Middleware\AdminOnly;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -40,6 +46,32 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/{userId}', [MessageController::class, 'send'])->name('messages.send');
+});
+
+// Admin routes
+Route::prefix('admin')->name('admin.')->middleware(['auth', AdminOnly::class])->group(function () {
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{user}/toggle-role', [AdminUserController::class, 'toggleRole'])->name('users.toggle-role');
+
+    Route::get('/properties', [AdminPropertyController::class, 'index'])->name('properties.index');
+    Route::get('/properties/{property}', [AdminPropertyController::class, 'show'])->name('properties.show');
+    Route::post('/properties/{property}/toggle', [AdminPropertyController::class, 'toggleActive'])->name('properties.toggle');
+    Route::delete('/properties/{property}', [AdminPropertyController::class, 'destroy'])->name('properties.destroy');
+
+    Route::get('/types', [AdminPropertyTypeController::class, 'index'])->name('types.index');
+    Route::post('/types', [AdminPropertyTypeController::class, 'store'])->name('types.store');
+    Route::put('/types/{type}', [AdminPropertyTypeController::class, 'update'])->name('types.update');
+    Route::delete('/types/{type}', [AdminPropertyTypeController::class, 'destroy'])->name('types.destroy');
+    Route::post('/types/{type}/toggle', [AdminPropertyTypeController::class, 'toggleActive'])->name('types.toggle');
+
+    Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [AdminBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{booking}/status/{status}', [AdminBookingController::class, 'updateStatus'])->name('bookings.status');
 });
 
 require __DIR__.'/auth.php';
