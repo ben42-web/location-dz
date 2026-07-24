@@ -17,7 +17,7 @@
         a { color: #818cf8; text-decoration: none; }
         a:hover { color: #a5b4fc; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; }
+        .glass { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; }
         .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; border: none; transition: all 0.2s; }
         .btn-primary { background: #6366f1; color: white; }
         .btn-primary:hover { background: #4f46e5; }
@@ -41,7 +41,7 @@
     </style>
 </head>
 <body>
-    <nav style="background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.08);padding:0.75rem 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);">
+    <nav style="background:rgba(15,12,41,0.95);border-bottom:1px solid rgba(255,255,255,0.08);padding:0.75rem 0;position:sticky;top:0;z-index:100;">
         <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
             <a href="{{ route('home') }}" style="font-size:1.25rem;font-weight:700;color:#818cf8;display:flex;align-items:center;gap:0.5rem;">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2v8a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2"/></svg>
@@ -51,7 +51,7 @@
                 <a href="{{ route('properties.index') }}" style="color:#94a3b8;font-size:0.875rem;font-weight:500;">Explorer</a>
                 @auth
                     @if(auth()->user()->role === 'admin')
-                    <a href="{{ route('admin.dashboard') }}" style="color:#ffffff;font-size:0.875rem;font-weight:700;">Admin</a>
+                    <a href="{{ route('admin.dashboard') }}" style="color:#ffffff;background:rgba(99,102,241,0.3);padding:0.375rem 0.75rem;border-radius:6px;font-size:0.8125rem;font-weight:700;text-decoration:none;">Admin</a>
                     @endif
                     <a href="{{ route('dashboard') }}" style="color:#94a3b8;font-size:0.875rem;font-weight:500;">Tableau de bord</a>
                     <a href="{{ route('messages.index') }}" style="color:#94a3b8;font-size:0.875rem;font-weight:500;">Messages</a>
@@ -60,7 +60,7 @@
                             <div style="width:32px;height:32px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:0.8125rem;">{{ substr(auth()->user()->name, 0, 1) }}</div>
                             {{ auth()->user()->name }}
                         </button>
-                        <div x-show="open" @click.away="open = false" x-cloak style="position:absolute;right:0;top:100%;margin-top:0.5rem;width:200px;background:rgba(30,27,75,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.5rem;backdrop-filter:blur(10px);">
+                        <div x-show="open" @click.away="open = false" x-cloak style="position:absolute;right:0;top:100%;margin-top:0.5rem;width:200px;background:rgba(30,27,75,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.5rem;">
                             <a href="{{ route('dashboard') }}" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;font-size:0.8125rem;color:#94a3b8;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">Mon tableau de bord</a>
                             <a href="{{ route('profile.edit') }}" style="display:block;padding:0.5rem 0.75rem;border-radius:6px;font-size:0.8125rem;color:#94a3b8;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">Mon profil</a>
                             <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:0.375rem 0;">
