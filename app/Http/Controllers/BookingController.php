@@ -16,6 +16,16 @@ class BookingController extends Controller
             'check_in' => 'required|date|after_or_equal:today',
             'check_out' => 'required|date|after:check_in',
             'guests' => 'required|integer|min:1',
+        ], [
+            'check_in.required' => 'La date d\'arrivée est requise.',
+            'check_in.date' => 'La date d\'arrivée doit être une date valide.',
+            'check_in.after_or_equal' => 'La date d\'arrivée doit être aujourd\'hui ou ultérieure.',
+            'check_out.required' => 'La date de départ est requise.',
+            'check_out.date' => 'La date de départ doit être une date valide.',
+            'check_out.after' => 'La date de départ doit être après la date d\'arrivée.',
+            'guests.required' => 'Le nombre de voyageurs est requis.',
+            'guests.integer' => 'Le nombre de voyageurs doit être un nombre entier.',
+            'guests.min' => 'Il doit y avoir au moins 1 voyageur.',
         ]);
 
         $property = Property::findOrFail($validated['property_id']);
